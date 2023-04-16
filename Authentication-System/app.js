@@ -33,10 +33,25 @@ app.use(
 
 const signin = require('./routes/signin');
 const signup = require('./routes/signup');
+const signout = require('./routes/signout');
+
+const create_user = require('./routes/create_user');
+const delete_all_users = require('./routes/delete_all_users');
+const delete_user = require('./routes/delete_user');
+const show_all_users = require('./routes/show_all_users');
+const show_user = require('./routes/show_user');
+const update_user = require('./routes/update_user');
 
 app.use(signin);
 app.use(signup);
+app.use(signout);
 
+app.use(create_user);
+app.use(delete_all_users);
+app.use(delete_user);
+app.use(show_all_users);
+app.use(show_user);
+app.use(update_user);
 
 app.all('*', async (req, res) => {
   throw new NotFoundError();

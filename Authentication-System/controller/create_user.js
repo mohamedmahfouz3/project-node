@@ -1,5 +1,3 @@
-const express = require('express');
-require('express-async-errors');
 const mongoose = require('mongoose');
 const all_users_Schema = require('../models/users');
 const Allusersdb = mongoose.model('allusersdb', all_users_Schema);

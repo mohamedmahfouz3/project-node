@@ -1,39 +1,55 @@
 const express = require('express');
-require('express-async-errors');
-const mongoose = require('mongoose');
-const all_users_Schema = require('../models/users');
-const Allusersdb = mongoose.model('allusersdb', all_users_Schema);
-const BadRequestError = require('../errors/bad-request-error');
 
-const create_user = async (req, res) => {
+const route = express.Router();
+
+const { body } = require('express-validator');
+const { create_user } = require('../controller/create_user');
+
+
+
+
+const validateRequest = require('../middlewares/validate-request');
+const currentUser = require('../middlewares/current-user');
+const requireAuth = require('../middlewares/require-auth');
  
-  const { email } = req.body;
 
-  // variabe to express that this user email is reserved before ? (email ---> unique)
+route.post(
+  '/api/users',
 
-  const existingEmail = await Allusersdb.findOne({ email });
 
-  // check if two fields is all ready reserved so this user is already in our system
-  if (existingEmail) {
-    throw new BadRequestError('This user is already exist');
-  }
+  [
+    body('name')
+      .trim()
+      .notEmpty()
+      .isString()
+      .matches(/^[a-zA-Z\s]+$/)
+      .withMessage('you must add a name'),
 
-  // check if only email is reserved
-  if (existingEmail) {
-    throw new BadRequestError('This email is reserved for another user');
-  }
+    body('email')
+      .notEmpty()
+      .withMessage('Email is required')
+      .isEmail()
+      .withMessage('Email must be valid'),
 
-  // Add new user
-  const users = new Allusersdb({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-  });
+    body('password')
+      .notEmpty()
+      .withMessage('Password is required')
+      .trim()
+      .isLength({ min: 4, max: 20 })
+      .withMessage('Password must be between 4 and 20 characters'),
+  ]     ,
+  
 
-  // save user in the database
-  users.save();
+  validateRequest,
+  currentUser,
+  requireAuth,
+ 
 
-  res.status(200).send('User created');
-};
 
-module.exports = { create_user };
+
+
+
+  create_user
+);
+
+module.exports = route;
